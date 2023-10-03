@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 const App = () => {
   const [items, setItems] = useState([
     { id: 1, description: 'Passports', quantity: 2, packed: false },
-    { id: 2, description: 'Socks', quantity: 12, packed: true },
+    { id: 2, description: 'Socks', quantity: 12, packed: false },
   ]);
   return (
     <div className="app">
@@ -70,23 +70,42 @@ const PackingList = ({ items, setItems }) => {
     );
     setItems(filteredItems);
   };
+  const onChangePacked = (idToPackedItem) => {
+    const updatedItems = items.map((item) => {
+      if (item.id === idToPackedItem) {
+        console.log(idToPackedItem);
+        return { ...item, packed: !item.packed };
+      }
+      return item;
+    });
+    setItems(updatedItems);
+  };
   return (
     <div className="list">
       <ul>
         {items.map((item) => (
-          <Item item={item} key={item.id} removeItem={removeItem} />
+          <Item
+            item={item}
+            key={item.id}
+            removeItem={removeItem}
+            onChangePacked={onChangePacked}
+          />
         ))}
       </ul>
     </div>
   );
 };
 
-const Item = ({ item, removeItem }) => {
+const Item = ({ item, removeItem, onChangePacked }) => {
   return (
     <li>
       <span
         style={item.packed ? { textDecoration: 'line-through' } : {}}
       >
+        <input
+          type="checkbox"
+          onChange={() => onChangePacked(item.id)}
+        />{' '}
         {item.quantity} {item.description}
       </span>
       <button onClick={() => removeItem(item.id)}>❌</button>
