@@ -10,7 +10,7 @@ const App = () => {
       <Logo />
       <Form items={items} setItems={setItems} />
       <PackingList items={items} setItems={setItems} />
-      <Stats />
+      <Stats items={items} />
     </div>
   );
 };
@@ -73,7 +73,6 @@ const PackingList = ({ items, setItems }) => {
   const onChangePacked = (idToPackedItem) => {
     const updatedItems = items.map((item) => {
       if (item.id === idToPackedItem) {
-        console.log(idToPackedItem);
         return { ...item, packed: !item.packed };
       }
       return item;
@@ -113,11 +112,21 @@ const Item = ({ item, removeItem, onChangePacked }) => {
   );
 };
 
-const Stats = () => {
+const Stats = ({ items }) => {
+  const itemsPacked = (items) => {
+    let packed = 0;
+    items.forEach((item) => {
+      if (item.packed === true) packed = packed + 1;
+    });
+    return packed; // Returning the count
+  };
+  const packed = itemsPacked(items);
   return (
     <footer className="stats">
       <em>
-        Your have X items on your list, and you already packed X (X%)
+        Your have {items.length} items on your list, and you already
+        packed {packed} ({((packed / items.length) * 100).toFixed(2)}
+        %)
       </em>
     </footer>
   );
