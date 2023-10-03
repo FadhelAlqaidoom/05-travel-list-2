@@ -5,11 +5,39 @@ const App = () => {
     { id: 1, description: 'Passports', quantity: 2, packed: false },
     { id: 2, description: 'Socks', quantity: 12, packed: false },
   ]);
+  const [sortBy, setSortBy] = useState('input');
+
+  const sortList = (items, sortBy, setItems) => {
+    let sortedList = [...items];
+    if (sortBy === 'input') {
+      sortedList.sort((a, b) => a.id - b.id);
+    } else if (sortBy === 'name') {
+      sortedList.sort((a, b) =>
+        a.description[0]
+          .toLowerCase()
+          .localeCompare(b.description[0].toLowerCase())
+      );
+    } else {
+      sortedList.sort((a, b) => b.packed - a.packed);
+    }
+    setItems(sortedList);
+  };
   return (
     <div className="app">
       <Logo />
-      <Form items={items} setItems={setItems} />
-      <PackingList items={items} setItems={setItems} />
+      <Form
+        items={items}
+        setItems={setItems}
+        sortBy={sortBy}
+        sortList={sortList}
+      />
+      <PackingList
+        items={items}
+        setItems={setItems}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+        sortList={sortList}
+      />
       <Stats items={items} />
     </div>
   );
@@ -19,7 +47,7 @@ const Logo = () => {
   return <h1>FAR AWAY</h1>;
 };
 
-const Form = ({ items, setItems }) => {
+const Form = ({ items, setItems, sortBy, sortList }) => {
   const [description, setDescription] = useState('');
   const [quantity, setQuantity] = useState(1);
 
@@ -29,12 +57,14 @@ const Form = ({ items, setItems }) => {
     if (!description) return;
 
     const newItem = {
+      id: Date.now(),
       description,
       quantity,
       packed: false,
-      id: Date.now(),
     };
-    setItems([...items, newItem]);
+    const newItems = [...items, newItem];
+    setItems(newItems);
+    sortList(newItems, sortBy, setItems);
     setDescription('');
     setQuantity(1);
   }
@@ -63,7 +93,16 @@ const Form = ({ items, setItems }) => {
   );
 };
 
-const PackingList = ({ items, setItems }) => {
+const PackingList = ({
+  items,
+  setItems,
+  sortBy,
+  setSortBy,
+  sortList,
+}) => {
+  const clearList = (items) => {
+    setItems([]);
+  };
   const removeItem = (idToRemove) => {
     const filteredItems = items.filter(
       (item) => item.id !== idToRemove
@@ -91,6 +130,21 @@ const PackingList = ({ items, setItems }) => {
           />
         ))}
       </ul>
+      <div className="actions">
+        <select
+          value={sortBy}
+          onChange={(e) => {
+            const newSortBy = e.target.value;
+            setSortBy(newSortBy);
+            sortList(items, newSortBy, setItems); // Notice the extra parameters
+          }}
+        >
+          <option value="input">sort by input order</option>
+          <option value="name">sort by name</option>
+          <option value="packed">sort by packed status</option>
+        </select>
+        <button onClick={() => clearList(items)}>CLEAR LIST</button>
+      </div>
     </div>
   );
 };
@@ -129,8 +183,12 @@ const Stats = ({ items }) => {
       <em>
         {Number(percentage) === 100
           ? 'You got everything! Ready to go!'
-          : `Your have ${items.length} items on your list, and you already
-        packed ${itemsPacked} (${percentage}
+          : `Your have ${
+              items.length
+            } items on your list, and you already
+        packed ${itemsPacked} (${
+              items.length === 0 ? '0.00' : percentage
+            }
         %)`}
       </em>
     </footer>
