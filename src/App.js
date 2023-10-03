@@ -113,19 +113,23 @@ const Item = ({ item, removeItem, onChangePacked }) => {
 };
 
 const Stats = ({ items }) => {
-  const itemsPacked = (items) => {
-    let packed = 0;
-    items.forEach((item) => {
-      if (item.packed === true) packed = packed + 1;
-    });
-    return packed; // Returning the count
-  };
-  const packed = itemsPacked(items);
+  // const itemsPacked = (items) => {
+  //   let packed = 0;
+  //   items.forEach((item) => {
+  //     if (item.packed === true) packed = packed + 1;
+  //   });
+  //   return packed; // Returning the count
+  // };
+  // const packed = itemsPacked;
+
+  const itemsPacked = items.filter((item) => item.packed).length;
+
   return (
     <footer className="stats">
       <em>
         Your have {items.length} items on your list, and you already
-        packed {packed} ({((packed / items.length) * 100).toFixed(2)}
+        packed {itemsPacked} (
+        {((itemsPacked / items.length) * 100).toFixed(2)}
         %)
       </em>
     </footer>
