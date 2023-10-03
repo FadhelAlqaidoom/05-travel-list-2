@@ -123,14 +123,15 @@ const Stats = ({ items }) => {
   // const packed = itemsPacked;
 
   const itemsPacked = items.filter((item) => item.packed).length;
-
+  const percentage = ((itemsPacked / items.length) * 100).toFixed(2);
   return (
     <footer className="stats">
       <em>
-        Your have {items.length} items on your list, and you already
-        packed {itemsPacked} (
-        {((itemsPacked / items.length) * 100).toFixed(2)}
-        %)
+        {Number(percentage) === 100
+          ? 'You got everything! Ready to go!'
+          : `Your have ${items.length} items on your list, and you already
+        packed ${itemsPacked} (${percentage}
+        %)`}
       </em>
     </footer>
   );
